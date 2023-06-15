@@ -1,29 +1,33 @@
 import { useEffect, useState } from 'react';
+import UserContext from './context/UserContext';
 import './App.css';
+import User from './components/User';
+import ChangeUser from './components/ChangeUser';
 
 function App() {
   const [person, setPerson] = useState();
+
   useEffect(() => {
-    fetch('http://127.0.0.1:5000')
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
+    const fetchData = async () => {
+      try {
+        const response = await fetch('http://127.0.0.1:5000');
+        const data = await response.json();
         setPerson(data);
-      })
-      .catch((err) => console.log(err));
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    fetchData();
   }, []);
 
   return (
-    <div className="App">
-      {person && (
-        <>
-          <h1>
-            {person.name} {person.lastName}
-          </h1>
-          <h2>{person.isInstructor ? 'Instructor' : 'Student'}</h2>
-        </>
-      )}
-    </div>
+    <UserContext.Provider value={{ person, setPerson }}>
+      <div className="App">
+        <User />
+        <ChangeUser />
+      </div>
+    </UserContext.Provider>
   );
 }
 
